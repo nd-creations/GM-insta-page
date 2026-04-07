@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GMinsta · Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Billabong&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#000;--surface:#0a0a0a;--card:#111;--border:#262626;
+  --text:#fff;--muted:#a8a8a8;--accent:#e1306c;
+  --grad:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;animation:float 8s ease-in-out infinite}
+.orb1{width:350px;height:350px;background:#833ab4;top:-80px;right:-80px;animation-delay:0s}
+.orb2{width:300px;height:300px;background:#e1306c;bottom:-60px;left:-60px;animation-delay:2.5s}
+.orb3{width:200px;height:200px;background:#f77737;top:40%;right:15%;animation-delay:1s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-25px)}}
+
+.container{position:relative;z-index:1;width:100%;max-width:400px;padding:20px}
+.card{
+  background:rgba(17,17,17,0.88);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:16px;
+  padding:40px 40px 32px;
+  animation:slideUp .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{
+  font-family:'Billabong',cursive;font-size:50px;text-align:center;margin-bottom:8px;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(225,48,108,.3));
+}
+.tagline{text-align:center;color:var(--muted);font-size:16px;font-weight:600;margin-bottom:28px}
+
+/* Avatar upload */
+.avatar-upload{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:10px}
+.avatar-ring{
+  width:88px;height:88px;border-radius:50%;padding:3px;
+  background:var(--grad);cursor:pointer;position:relative;
+}
+.avatar-inner{
+  width:100%;height:100%;border-radius:50%;background:#1a1a1a;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  font-size:32px;color:var(--muted);transition:all .25s;
+}
+.avatar-ring:hover .avatar-inner{background:#222}
+.avatar-ring input{position:absolute;inset:0;opacity:0;cursor:pointer;border-radius:50%}
+.avatar-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:none}
+.avatar-label{font-size:13px;color:var(--muted)}
+
+.input-group{position:relative;margin-bottom:10px}
+.input-group input{
+  width:100%;background:#1a1a1a;border:1px solid var(--border);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;
+  padding:13px 16px;border-radius:10px;outline:none;transition:all .25s;
+}
+.input-group input:focus{border-color:#555;background:#222}
+.input-group input::placeholder{color:var(--muted)}
+
+.btn{
+  width:100%;padding:14px;border:none;border-radius:10px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  background:var(--grad);color:#fff;margin-top:6px;
+  position:relative;overflow:hidden;transition:opacity .2s,transform .15s;
+}
+.btn:hover{opacity:.9;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+
+.terms{text-align:center;font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
+.terms a{color:#e1306c;text-decoration:none}
+
+.login-card{
+  background:rgba(17,17,17,0.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:16px;
+  padding:18px;text-align:center;margin-top:12px;
+  font-size:14px;color:var(--muted);
+  animation:slideUp .6s .15s cubic-bezier(.22,1,.36,1) both;
+}
+.login-card a{color:#fff;font-weight:600;text-decoration:none}
+.login-card a:hover{color:#e1306c}
+
+.error-msg{
+  background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.3);
+  color:#e1306c;font-size:13px;padding:10px 14px;border-radius:8px;
+  margin-bottom:12px;display:none;
+}
+.success-msg{
+  background:rgba(0,200,100,.1);border:1px solid rgba(0,200,100,.3);
+  color:#00c864;font-size:13px;padding:10px 14px;border-radius:8px;
+  margin-bottom:12px;display:none;
+}
+</style>
+</head>
+<body>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div class="container">
+  <div class="card">
+    <div class="logo">GMinsta</div>
+    <div class="tagline">Sign up to see photos & videos</div>
+
+    <!-- Profile pic upload -->
+    <div class="avatar-upload">
+      <div class="avatar-ring" id="avatarRing">
+        <div class="avatar-inner" id="avatarInner">
+          📷
+          <img id="avatarPreview"/>
+        </div>
+        <input type="file" accept="image/*" id="avatarFile" onchange="previewAvatar(this)"/>
+      </div>
+      <span class="avatar-label">Add profile photo (optional)</span>
+    </div>
+
+    <div class="error-msg" id="errMsg"></div>
+    <div class="success-msg" id="sucMsg"></div>
+
+    <div class="input-group">
+      <input type="text" id="fullname" placeholder="Full name"/>
+    </div>
+    <div class="input-group">
+      <input type="text" id="username" placeholder="Username"/>
+    </div>
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Email"/>
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password"/>
+    </div>
+    <button class="btn" onclick="doRegister()">Sign Up</button>
+    <div class="terms">
+      By signing up, you agree to our <a href="#">Terms</a>, <a href="#">Privacy Policy</a> and <a href="#">Cookies Policy</a>.
+    </div>
+  </div>
+  <div class="login-card">
+    Have an account? <a href="/login">Log in</a>
+  </div>
+</div>
+<script>
+function previewAvatar(input){
+  if(input.files&&input.files[0]){
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=document.getElementById('avatarPreview');
+      img.src=e.target.result;img.style.display='block';
+      document.getElementById('avatarInner').style.fontSize='0';
+    }
+    r.readAsDataURL(input.files[0]);
+  }
+}
+async function doRegister(){
+  const fullname=document.getElementById('fullname').value.trim();
+  const username=document.getElementById('username').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
+  const avatarFile=document.getElementById('avatarFile').files[0];
+  const err=document.getElementById('errMsg');
+  const suc=document.getElementById('sucMsg');
+  err.style.display='none';suc.style.display='none';
+  if(!fullname||!username||!email||!password){err.textContent='Please fill in all fields.';err.style.display='block';return}
+
+  const fd=new FormData();
+  fd.append('fullname',fullname);fd.append('username',username);
+  fd.append('email',email);fd.append('password',password);
+  if(avatarFile)fd.append('avatar',avatarFile);
+
+  try{
+    const r=await fetch('/auth/register',{method:'POST',body:fd});
+    const d=await r.json();
+    if(r.ok){suc.textContent='Account created! Redirecting...';suc.style.display='block';setTimeout(()=>window.location='/home',1200)}
+    else{err.textContent=d.message||'Registration failed.';err.style.display='block'}
+  }catch(e){err.textContent='Network error.';err.style.display='block'}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GMinsta · Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Billabong&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#000;--surface:#0a0a0a;--card:#111;--border:#262626;
+  --text:#fff;--muted:#a8a8a8;--accent:#e1306c;
+  --grad:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+
+/* Animated background orbs */
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:float 8s ease-in-out infinite}
+.orb1{width:400px;height:400px;background:#e1306c;top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:300px;height:300px;background:#833ab4;bottom:-80px;right:-80px;animation-delay:3s}
+.orb3{width:250px;height:250px;background:#f77737;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:1.5s}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+.orb3{animation:float3 10s ease-in-out infinite}
+@keyframes float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-60%) scale(1.1)}}
+
+.container{position:relative;z-index:1;width:100%;max-width:400px;padding:20px}
+
+/* Phone mockup on larger screens */
+.card{
+  background:rgba(17,17,17,0.85);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:44px 40px 36px;
+  animation:slideUp .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{
+  font-family:'Billabong',cursive;
+  font-size:52px;
+  text-align:center;
+  margin-bottom:32px;
+  background:var(--grad);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(225,48,108,.3));
+  animation:logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse{0%,100%{filter:drop-shadow(0 0 20px rgba(225,48,108,.3))}50%{filter:drop-shadow(0 0 35px rgba(225,48,108,.6))}}
+
+.input-group{position:relative;margin-bottom:12px}
+.input-group input{
+  width:100%;background:#1a1a1a;border:1px solid var(--border);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;
+  padding:14px 16px;border-radius:10px;outline:none;transition:all .25s;
+}
+.input-group input:focus{border-color:#555;background:#222}
+.input-group input::placeholder{color:var(--muted)}
+
+.btn{
+  width:100%;padding:14px;border:none;border-radius:10px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  background:var(--grad);color:#fff;margin-top:4px;
+  position:relative;overflow:hidden;transition:opacity .2s,transform .15s;
+}
+.btn:hover{opacity:.92;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(rgba(255,255,255,.1),transparent);
+}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:13px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.forgot{text-align:center;margin-top:14px}
+.forgot a{color:#e1306c;font-size:13px;text-decoration:none}
+.forgot a:hover{text-decoration:underline}
+
+.register-card{
+  background:rgba(17,17,17,0.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:16px;
+  padding:18px;text-align:center;margin-top:12px;
+  font-size:14px;color:var(--muted);
+  animation:slideUp .6s .15s cubic-bezier(.22,1,.36,1) both;
+}
+.register-card a{color:#fff;font-weight:600;text-decoration:none}
+.register-card a:hover{color:#e1306c}
+
+.error-msg{
+  background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.3);
+  color:#e1306c;font-size:13px;padding:10px 14px;border-radius:8px;
+  margin-bottom:12px;display:none;
+}
+
+/* Floating mini posts decoration */
+.deco-posts{position:fixed;pointer-events:none;z-index:0}
+.deco-post{
+  position:absolute;width:60px;height:60px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);
+  opacity:.12;animation:floatPost 6s ease-in-out infinite;
+}
+.deco-post:nth-child(1){top:10%;left:8%;animation-delay:0s}
+.deco-post:nth-child(2){top:20%;right:10%;animation-delay:1s;width:45px;height:45px}
+.deco-post:nth-child(3){bottom:15%;left:12%;animation-delay:2s;width:50px;height:70px}
+.deco-post:nth-child(4){bottom:25%;right:8%;animation-delay:.5s}
+@keyframes floatPost{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-15px) rotate(3deg)}}
+</style>
+</head>
+<body>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div class="deco-posts">
+  <div class="deco-post"></div>
+  <div class="deco-post"></div>
+  <div class="deco-post"></div>
+  <div class="deco-post"></div>
+</div>
+<div class="container">
+  <div class="card">
+    <div class="logo">GMinsta</div>
+    <div class="error-msg" id="errMsg"></div>
+    <div class="input-group">
+      <input type="text" id="username" placeholder="Username or email" autocomplete="username"/>
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password"/>
+    </div>
+    <button class="btn" onclick="doLogin()">Log In</button>
+    <div class="forgot"><a href="#">Forgot password?</a></div>
+  </div>
+  <div class="register-card">
+    Don't have an account? <a href="/register">Sign up</a>
+  </div>
+</div>
+<script>
+async function doLogin(){
+  const username=document.getElementById('username').value.trim();
+  const password=document.getElementById('password').value;
+  const err=document.getElementById('errMsg');
+  err.style.display='none';
+  if(!username||!password){err.textContent='Please fill in all fields.';err.style.display='block';return}
+  try{
+    const r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    const d=await r.json();
+    if(r.ok){window.location='/home'}
+    else{err.textContent=d.message||'Invalid credentials.';err.style.display='block'}
+  }catch(e){err.textContent='Network error. Try again.';err.style.display='block'}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
+</script>
+</body>
+</html>
