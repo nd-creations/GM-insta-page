@@ -4,7 +4,7 @@ const User = require('../models/User');
 const upload = require('../middleware/upload');
 const requireAuth = require('../middleware/requireAuth');
 
-// POST /auth/register — with optional avatar
+// POST /auth/register
 router.post('/register', upload.single('avatar'), async (req, res) => {
   try {
     const { fullname, username, email, password, bio } = req.body;
@@ -40,7 +40,12 @@ router.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 });
 
-// GET /auth/me — return full user WITH followers/following arrays
+// POST /auth/logout (for fetch calls)
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => res.json({ success: true }));
+});
+
+// GET /auth/me
 router.get('/me', requireAuth, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId)
@@ -49,7 +54,6 @@ router.get('/me', requireAuth, async (req, res) => {
       .populate('following', '_id username avatar')
       .lean();
     if (!user) return res.status(401).json({ message: 'Not logged in' });
-    // Add computed counts for easy access
     user.followersCount = user.followers.length;
     user.followingCount = user.following.length;
     res.json(user);
@@ -58,13 +62,13 @@ router.get('/me', requireAuth, async (req, res) => {
   }
 });
 
-// POST /auth/avatar — upload profile photo
+// POST /auth/avatar — upload/update profile photo
 router.post('/avatar', requireAuth, upload.single('avatar'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
     const avatarUrl = '/uploads/avatars/' + req.file.filename;
     await User.findByIdAndUpdate(req.session.userId, { avatar: avatarUrl });
-    res.json({ avatar: avatarUrl });
+    res.json({ success: true, avatar: avatarUrl });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -87,12 +91,12 @@ router.put('/profile', requireAuth, async (req, res) => {
   }
 });
 
-// GET /auth/suggestions — users to follow (not already following)
+// GET /auth/suggestions — users to follow
 router.get('/suggestions', requireAuth, async (req, res) => {
   try {
     const me = await User.findById(req.session.userId).lean();
     const followingIds = (me.following || []).map(id => id.toString());
-    followingIds.push(req.session.userId.toString()); // exclude self
+    followingIds.push(req.session.userId.toString());
     const users = await User.find({ _id: { $nin: followingIds } })
       .select('username fullname avatar followers following')
       .limit(20).lean();
@@ -102,7 +106,7 @@ router.get('/suggestions', requireAuth, async (req, res) => {
   }
 });
 
-// GET /auth/users — all users except me (for chat/share)
+// GET /auth/users — all users except me
 router.get('/users', requireAuth, async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: req.session.userId } })
@@ -113,24 +117,56 @@ router.get('/users', requireAuth, async (req, res) => {
   }
 });
 
-// POST /auth/follow/:id — follow/unfollow toggle — KEY FIX: returns { followed }
+// GET /auth/search?q=... — search friends by username, fullname, or user ID
+router.get('/search', requireAuth, async (req, res) => {
+  try {
+    const q = req.query.q?.trim();
+    if (!q) return res.json([]);
+
+    // Try matching by ObjectId first (if it looks like one)
+    const isObjectId = /^[a-f\d]{24}$/i.test(q);
+    let users = [];
+    if (isObjectId) {
+      const byId = await User.findById(q).select('username fullname avatar followers following').lean();
+      if (byId && byId._id.toString() !== req.session.userId.toString()) users = [byId];
+    }
+    if (!users.length) {
+      users = await User.find({
+        _id: { $ne: req.session.userId },
+        $or: [
+          { username: { $regex: q, $options: 'i' } },
+          { fullname: { $regex: q, $options: 'i' } }
+        ]
+      }).select('username fullname avatar followers following').limit(15).lean();
+    }
+
+    // Add isFollowing flag for each result
+    const me = await User.findById(req.session.userId).select('following').lean();
+    const myFollowing = (me.following || []).map(id => id.toString());
+    const result = users.map(u => ({
+      ...u,
+      isFollowing: myFollowing.includes(u._id.toString()),
+      followersCount: u.followers?.length || 0
+    }));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST /auth/follow/:id — follow/unfollow toggle
 router.post('/follow/:id', requireAuth, async (req, res) => {
   try {
     const targetId = req.params.id;
     const myId = req.session.userId;
-
     if (targetId === myId.toString()) return res.status(400).json({ message: 'Cannot follow yourself' });
-
     const me = await User.findById(myId);
     const isFollowing = me.following.some(id => id.toString() === targetId);
-
     if (isFollowing) {
-      // Unfollow
       await User.findByIdAndUpdate(myId,     { $pull: { following: targetId } });
       await User.findByIdAndUpdate(targetId, { $pull: { followers: myId } });
       res.json({ followed: false, message: 'Unfollowed' });
     } else {
-      // Follow
       await User.findByIdAndUpdate(myId,     { $addToSet: { following: targetId } });
       await User.findByIdAndUpdate(targetId, { $addToSet: { followers: myId } });
       res.json({ followed: true, message: 'Following' });
