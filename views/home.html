@@ -183,21 +183,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .cb-send{background:none;border:none;cursor:pointer;color:var(--pink2);font-size:.82rem;font-weight:700;opacity:0;transform:translateX(6px);transition:opacity .2s,transform .2s}
 .cb-send.show{opacity:1;transform:translateX(0)}
 
-/* REELS — bottom of feed like Instagram */
-.reels-section{margin:4px 0 8px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;display:none}
-@media(min-width:768px){.reels-section{border:1px solid var(--border);border-radius:var(--r);margin:0 0 16px}}
-.reels-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px}
-.reels-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:6px}
-.reels-see-all{color:var(--pink2);font-size:.78rem;font-weight:700;cursor:pointer;background:none;border:none;font-family:inherit}
-.reels-scroll{display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory}
-.reels-scroll::-webkit-scrollbar{display:none}
-.reel-card{flex-shrink:0;width:108px;height:180px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;scroll-snap-align:start;background:var(--surface3)}
-.reel-card video{width:100%;height:100%;object-fit:cover;display:block}
-.reel-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:space-between;padding:8px}
-.reel-play{align-self:center;margin:auto;width:32px;height:32px;background:rgba(255,255,255,.2);backdrop-filter:blur(4px);border-radius:50%;display:flex;align-items:center;justify-content:center}
-.reel-info{align-self:flex-end;width:100%}
-.reel-user{font-size:.65rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.reel-likes{font-size:.62rem;color:rgba(255,255,255,.8)}
+/* reels section removed — now fullscreen viewer */
 
 /* SKELETONS */
 .skeleton-card{background:var(--surface);margin-bottom:2px}
@@ -320,6 +306,33 @@ input[type=file]{display:none}
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+
+/* FULLSCREEN REELS VIEWER */
+.reels-viewer{position:fixed;inset:0;z-index:600;background:#000;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .25s}
+.reels-viewer.open{opacity:1;pointer-events:all}
+.reels-viewer-header{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 16px env(safe-area-inset-top,16px);background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent)}
+.rv-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff}
+.rv-close{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:none;cursor:pointer;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.reels-feed{flex:1;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}
+.reels-feed::-webkit-scrollbar{display:none}
+.reel-item{height:100dvh;width:100%;position:relative;scroll-snap-align:start;flex-shrink:0;background:#000;display:flex;align-items:center;justify-content:center}
+.reel-item video{width:100%;height:100%;object-fit:contain;display:block}
+.reel-item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 40%,transparent 70%,rgba(0,0,0,.3) 100%);pointer-events:none}
+.reel-item-info{position:absolute;bottom:0;left:0;right:60px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));z-index:5}
+.reel-item-user{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.reel-item-av{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid #fff;flex-shrink:0}
+.reel-item-av img{width:100%;height:100%;object-fit:cover}
+.reel-item-username{font-weight:700;color:#fff;font-size:.9rem}
+.reel-item-caption{font-size:.84rem;color:rgba(255,255,255,.9);line-height:1.5;max-height:60px;overflow:hidden}
+.reel-item-actions{position:absolute;bottom:0;right:0;padding:20px 12px calc(20px + env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;align-items:center;gap:20px}
+.reel-action-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;background:none;border:none;color:#fff}
+.reel-action-btn svg{width:28px;height:28px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.reel-action-btn.liked svg{fill:var(--red);stroke:var(--red)}
+.reel-action-label{font-size:.7rem;color:#fff;font-weight:600}
+.reels-empty-full{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.5);text-align:center;padding:24px}
+.reels-empty-full .e-ico{font-size:4rem;margin-bottom:16px}
+.reels-empty-full h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:8px}
+.reels-empty-full p{font-size:.85rem;line-height:1.6}
 </style>
 </head>
 <body>
@@ -330,8 +343,8 @@ input[type=file]{display:none}
     <div class="logo-gm">GMinsta</div>
   </div>
   <div class="topbar-right">
-    <button class="icon-btn" onclick="toggleSearch()" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-    <button class="icon-btn" onclick="openUpload()" title="New Post"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
+
+
     <button class="icon-btn" onclick="location.href='/chat'" title="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
     <button class="icon-btn" onclick="toggleNotifs()" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" id="badge">3</span></button>
     <button class="icon-btn" onclick="location.href='/profile'" title="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
@@ -378,14 +391,7 @@ input[type=file]{display:none}
       </div>
     </div>
 
-    <!-- REELS — at bottom of feed like real Instagram -->
-    <div class="reels-section" id="reelsSection">
-      <div class="reels-header">
-        <span class="reels-title">🎬 Reels</span>
-        <button class="reels-see-all" onclick="scrollToTop()">See all</button>
-      </div>
-      <div class="reels-scroll" id="reelsScroll"></div>
-    </div>
+    <div id="reelsScroll" style="display:none"></div>
   </main>
   <aside class="sidebar" id="sidebar"></aside>
 </div>
@@ -395,7 +401,7 @@ input[type=file]{display:none}
   <button class="nav-btn active" onclick="scrollToTop()"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg></button>
   <button class="nav-btn" onclick="toggleSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
   <button class="nav-create-btn" onclick="openUpload()">＋</button>
-  <button class="nav-btn" onclick="location.href='/chat'"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+  <button class="nav-btn" id="reelsNavBtn" onclick="openReelsViewer()" title="Reels"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8"/></svg></button>
   <button class="nav-btn" onclick="location.href='/profile'"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
 </nav>
 
@@ -458,6 +464,16 @@ input[type=file]{display:none}
   </div>
 </div>
 
+
+<!-- FULLSCREEN REELS VIEWER -->
+<div class="reels-viewer" id="reelsViewer">
+  <div class="reels-viewer-header">
+    <span class="rv-title">🎬 Reels</span>
+    <button class="rv-close" onclick="closeReelsViewer()">✕</button>
+  </div>
+  <div class="reels-feed" id="reelsFeed"></div>
+</div>
+
 <div class="toasts" id="toasts"></div>
 
 <script>
@@ -473,6 +489,114 @@ const NOTIFS=[
   {user:'Karan V.',text:'liked your photo',time:'2h ago',icon:'❤️',unread:false},
   {user:'Sneha R.',text:'started following you',time:'3h ago',icon:'👤',unread:false},
 ];
+
+
+/* FULLSCREEN REELS VIEWER */
+let reelsViewerOpen = false;
+
+function openReelsViewer() {
+  const videoPosts = posts.filter(p => p.mediaType === 'video');
+  const feed = document.getElementById('reelsFeed');
+  const btn = document.getElementById('reelsNavBtn');
+
+  if (!videoPosts.length) {
+    toast('No reels yet. Upload a video to create one!');
+    return;
+  }
+
+  feed.innerHTML = videoPosts.map((p, i) => {
+    const av = p.author?.avatar || '';
+    const lc = p.likesCount || 0;
+    return `<div class="reel-item" data-id="${p._id}" data-idx="${i}">
+      <video src="${p.mediaUrl}" loop playsinline preload="auto"
+        style="width:100%;height:100%;object-fit:contain;display:block"></video>
+      <div class="reel-item-overlay"></div>
+      <div class="reel-item-info">
+        <div class="reel-item-user">
+          <div class="reel-item-av">${av ? `<img src="${av}" onerror="this.parentElement.innerHTML='👤'"/>` : '👤'}</div>
+          <span class="reel-item-username">@${esc(p.author?.username || '')}</span>
+        </div>
+        ${p.caption ? `<div class="reel-item-caption">${esc(p.caption)}</div>` : ''}
+      </div>
+      <div class="reel-item-actions">
+        <button class="reel-action-btn ${p.liked ? 'liked' : ''}" id="rlb-${p._id}" onclick="toggleReelLike('${p._id}',this)">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span class="reel-action-label" id="rlc-${p._id}">${lc}</span>
+        </button>
+        <button class="reel-action-btn" onclick="toast('💬 Comments coming soon')">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="reel-action-label">${p.commentsCount || 0}</span>
+        </button>
+        <button class="reel-action-btn" onclick="sharePost('${p._id}')">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span class="reel-action-label">Share</span>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('reelsViewer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  btn && btn.classList.add('active');
+  reelsViewerOpen = true;
+
+  // Auto-play first video, pause others on scroll
+  setupReelObserver();
+}
+
+function setupReelObserver() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const video = entry.target.querySelector('video');
+      if (!video) return;
+      if (entry.isIntersecting) {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, { threshold: 0.6 });
+
+  document.querySelectorAll('.reel-item').forEach(item => observer.observe(item));
+}
+
+function closeReelsViewer() {
+  document.getElementById('reelsViewer').classList.remove('open');
+  document.body.style.overflow = '';
+  // Pause all videos
+  document.querySelectorAll('#reelsFeed video').forEach(v => { v.pause(); v.currentTime = 0; });
+  document.getElementById('reelsNavBtn')?.classList.remove('active');
+  reelsViewerOpen = false;
+}
+
+async function toggleReelLike(id, btn) {
+  const wasLiked = btn.classList.contains('liked');
+  btn.classList.toggle('liked', !wasLiked);
+  const post = posts.find(p => p._id === id);
+  if (post) { post.liked = !wasLiked; post.likesCount = (post.likesCount || 0) + (!wasLiked ? 1 : -1); }
+  const countEl = document.getElementById('rlc-' + id);
+  if (countEl && post) countEl.textContent = post.likesCount;
+  try {
+    const r = await fetch(`/posts/${id}/like`, { method: 'POST' });
+    if (r.ok) {
+      const d = await r.json();
+      if (post) { post.likesCount = d.likesCount; post.liked = d.liked; }
+      if (countEl) countEl.textContent = d.likesCount;
+      btn.classList.toggle('liked', d.liked);
+    }
+  } catch(e) {}
+}
+
+
+// Image error handler — shows the broken URL so user knows what path failed
+function imgErr(img, src) {
+  img.style.display = 'none';
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:var(--text3);gap:6px;padding:12px;text-align:center';
+  div.innerHTML = '<span style="font-size:2rem">📷</span><span style="font-size:.72rem;word-break:break-all;max-width:90%">Failed: ' + src + '</span><span style="font-size:.68rem">Check /debug/files in browser</span>';
+  img.parentElement.appendChild(div);
+}
 
 async function init(){
   await loadMe();
@@ -659,7 +783,18 @@ async function loadPosts(){
     else posts=await r.json();
   }catch(e){}
   document.getElementById('feedLoader')?.remove();
-  buildReels(posts.filter(p=>p.mediaType==='video'));
+  // DEBUG: log image URLs to console so you can check the path
+  if(posts.length > 0){
+    console.log('✅ Posts loaded:', posts.length);
+    console.log('📸 First post mediaUrl:', posts[0].mediaUrl);
+    console.log('📸 Expected URL pattern: /uploads/posts/filename.jpg');
+    // Test if image is accessible
+    const testImg = new Image();
+    testImg.onload = () => console.log('✅ Image loads correctly:', posts[0].mediaUrl);
+    testImg.onerror = () => console.error('❌ Image FAILED to load:', posts[0].mediaUrl, '— Check that app.js serves /uploads/ from public/uploads/');
+    if(posts[0].mediaUrl) testImg.src = posts[0].mediaUrl;
+  }
+  // reels handled by fullscreen viewer
   const seen=new Set();
   const authors=posts.map(p=>p.author).filter(a=>{if(!a||seen.has(a._id))return false;seen.add(a._id);return true;});
   buildStories(authors);
@@ -680,9 +815,10 @@ function makeCard(p,i){
   card.className='post-card';card.id='post-'+p._id;
   card.style.animationDelay=(i*0.06+0.05)+'s';
   const avHtml=p.author?.avatar?`<img src="${p.author.avatar}" onerror="this.parentElement.innerHTML='👤'"/>`:`<span>${(p.author?.username||'?')[0].toUpperCase()}</span>`;
+  const mediaSrc = p.mediaUrl || '';
   const media=p.mediaType==='video'
-    ?`<video src="${p.mediaUrl}" controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover"></video>`
-    :`<img src="${p.mediaUrl}" loading="lazy" alt="" onerror="this.style.background='var(--surface3)'"/>`;
+    ?`<video src="${mediaSrc}" controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block"></video>`
+    :`<img src="${mediaSrc}" alt="post" style="width:100%;height:100%;object-fit:cover;display:block;background:var(--surface3)" onerror="imgErr(this,'${mediaSrc}')"/>`;
   const lc=p.likesCount||0;
   card.innerHTML=`
     <div class="post-header">
@@ -800,7 +936,7 @@ async function submitPost(){
   const fd=new FormData();fd.append('media',selectedFile);fd.append('caption',document.getElementById('captionIn').value);fd.append('location',document.getElementById('locationIn').value);
   try{
     const r=await fetch('/posts',{method:'POST',body:fd});
-    if(r.ok){const p=await r.json();posts.unshift(p);closeUpload();buildReels(posts.filter(x=>x.mediaType==='video'));renderPosts();scrollToTop();toast('🎉 Post shared!');}
+    if(r.ok){const p=await r.json();posts.unshift(p);closeUpload();renderPosts();scrollToTop();toast('🎉 Post shared!');}
     else{const e=await r.json();toast('❌ '+(e.message||'Upload failed'));}
   }catch(e){toast('❌ Upload failed');}
   btn.disabled=false;btn.textContent='Share Post';
@@ -881,7 +1017,7 @@ function fmtTime(ts){if(!ts)return'';const diff=Date.now()-new Date(ts).getTime(
 function toast(msg){const w=document.getElementById('toasts'),el=document.createElement('div');el.className='toast';el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3200);}
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLikes();closeUpload();closeSheet();closeStory();closeStoryAdd();closeAllPanels();if(searchOpen)toggleSearch();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLikes();closeUpload();closeSheet();closeStory();closeStoryAdd();closeAllPanels();if(searchOpen)toggleSearch();if(reelsViewerOpen)closeReelsViewer();}});
 init();
 </script>
 </body>
