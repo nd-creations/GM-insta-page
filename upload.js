@@ -1,47 +1,55 @@
-// upload.js  (lives at project root, next to app.js)
 const multer = require('multer');
-const path   = require('path');
-const fs     = require('fs');
+const path = require('path');
+const fs = require('fs');
 
-// ── destination folders ──────────────────────────────────────────────────────
-const POSTS_DIR = path.join(__dirname, 'public/uploads/posts');
-const AVA_DIR   = path.join(__dirname, 'public/uploads/avatars');
+// correct folders
+const POSTS_DIR = path.join(__dirname, 'public', 'uploads', 'posts');
+const AVATAR_DIR = path.join(__dirname, 'public', 'uploads', 'avatars');
 
-[POSTS_DIR, AVA_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+// create folders
+[POSTS_DIR, AVATAR_DIR].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
 });
 
-// ── allowed MIME types ───────────────────────────────────────────────────────
-const ALLOWED = /jpeg|jpg|png|gif|webp|mp4|mov|avi|mkv|webm/;
-
+// allow files
 function fileFilter(req, file, cb) {
-  const ext  = ALLOWED.test(path.extname(file.originalname).toLowerCase());
-  const mime = ALLOWED.test(file.mimetype);
-  ext && mime ? cb(null, true) : cb(new Error('Only images and videos are allowed'));
+  cb(null, true);
 }
 
-// ── storage: posts ───────────────────────────────────────────────────────────
+// post storage
 const postStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, POSTS_DIR),
-  filename:    (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname).toLowerCase());
+  destination: (req, file, cb) => {
+    cb(null, POSTS_DIR);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname));
   }
 });
 
-// ── storage: avatars ─────────────────────────────────────────────────────────
+// avatar storage
 const avatarStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, AVA_DIR),
-  filename:    (req, file, cb) => {
-    // name it after the user so old avatars are auto-replaced
-    const userId = req.session?.userId ?? 'unknown';
-    cb(null, `${userId}${path.extname(file.originalname).toLowerCase()}`);
+  destination: (req, file, cb) => {
+    cb(null, AVATAR_DIR);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname));
   }
 });
 
-// ── exported uploaders ───────────────────────────────────────────────────────
-const upload       = multer({ storage: postStorage,  limits: { fileSize: 50 * 1024 * 1024 }, fileFilter });
-const uploadAvatar = multer({ storage: avatarStorage, limits: { fileSize: 5  * 1024 * 1024 }, fileFilter });
+const post = multer({
+  storage: postStorage,
+  fileFilter
+});
 
-module.exports        = upload;          // default  → used by postRoutes.js
-module.exports.avatar = uploadAvatar;    // named    → used by authRoutes / profileRoutes
+const avatar = multer({
+  storage: avatarStorage,
+  fileFilter
+});
+
+// CORRECT EXPORT
+module.exports = {
+  post,
+  avatar
+};
